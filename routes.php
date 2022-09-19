@@ -1,7 +1,8 @@
 <?php
 
 session_start();
-
+include_once(dirname(__FILE__) . "/helpers/_helpers.php");
+include_once(dirname(__FILE__) . "/models/_models.php");
 include_once(dirname(__FILE__) . "/lib/Router.php");
 include_once(dirname(__FILE__) . "/lib/Response.php");
 

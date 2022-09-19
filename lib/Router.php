@@ -14,7 +14,7 @@ class Router
 	);
 
 	protected $isAuth;
-	
+
 	public function __construct($options = array())
 	{
 		$_ENV["options"] = $this->options;
@@ -34,7 +34,7 @@ class Router
 		 * y asignarlos a la variable parámetros que se pintaran en el cliente
 		 */
 		foreach ($_ENV["options"]["globalParams"] as $key => $value) {
-			$_ENV["params"]["{{".$key."}}"] = $value;
+			$_ENV["params"]["{{" . $key . "}}"] = $value;
 		}
 	}
 
@@ -86,10 +86,6 @@ class Router
 	function route($route, $path_to_include)
 	{
 
-		if ($this->isAuth) {
-			call_user_func($_ENV["options"]["validateAuth"]);
-		}
-
 		$ROOT = $_SERVER['DOCUMENT_ROOT'] . $_ENV["options"]["relativePath"];
 		if ($route == "/404") {
 			include_once("$ROOT/$path_to_include");
@@ -107,6 +103,9 @@ class Router
 		array_shift($request_url_parts);
 
 		if ($route_parts[0] == '' && count($request_url_parts) == 0) {
+			if ($this->isAuth) {
+				call_user_func($_ENV["options"]["validateAuth"]);
+			}
 			include_once("$ROOT/$path_to_include");
 			exit();
 		}
@@ -133,13 +132,19 @@ class Router
 			exit();
 		}
 
+		unset($request_uri, $request_url_parts, $route_part, $route_parts, $__i__);
+		if ($this->isAuth) {
+			call_user_func($_ENV["options"]["validateAuth"]);
+		}
 		include_once("$ROOT/$path_to_include");
 		exit();
 	}
+
 	function out($text)
 	{
 		echo htmlspecialchars($text);
 	}
+
 	function set_csrf()
 	{
 		if (!isset($_SESSION["csrf"])) {

@@ -26,6 +26,10 @@ class Response
         exit(json_encode((object) $object));
     }
 
+    public static function sendCode($code){
+        exit(header("HTTP/1.0 $code"));
+    }
+
     private function minify_html($htmlMain)
     {
         $search = array(
@@ -49,19 +53,23 @@ class Response
 
         $files = array_diff(scandir($layoutDir), array('.', '..'));
 
-        foreach ($files as $key => $value) {
-            if (str_ends_with($value, ".html")) {
-                $layouts["{{>" . str_replace(".html", "", $value) . "}}"] = file_get_contents("$layoutDir /$value");
-            } elseif (str_ends_with($value, ".php")) {
+        foreach ($files as $file) {
+            if (str_ends_with($file, ".html")) {
+                $layouts["{{>" . str_replace(".html", "", $file) . "}}"] = file_get_contents("$layoutDir /$file");
+            } elseif (str_ends_with($file, ".php")) {
 
-                ob_start();
+                try {
+                    ob_start();
 
-                include_once "$layoutDir /$value";
-                $html = ob_get_contents();
+                    include_once "$layoutDir /$file";
+                    $html = ob_get_contents();
 
-                ob_end_clean();
+                    ob_end_clean();
 
-                $layouts["{{>" . str_replace(".php", "", $value) . "}}"] = $html;
+                    $layouts["{{>" . str_replace(".php", "", $file) . "}}"] = $html;
+                } catch (\Throwable $th) {
+                    //throw $th;
+                }
             }
         }
 
@@ -78,13 +86,6 @@ class Response
         exit($htmlMain);
     }
 
-    /**
-     * Obtiene la ejecución de archivo php, y retorna la salida
-     * puede ser el html renderizado con todas sus variables e información 
-     * 
-     * @param string $path Ruta de archivo php
-     * @return string
-     */
     private function renderPHP(string $path)
     {
 

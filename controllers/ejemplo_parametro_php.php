@@ -1,6 +1,5 @@
 <?php
 
-include_once(dirname(__FILE__) . "/../models/modelo.class.php");
 
 /**
  * Se invoca clase que puede ser un modelo
